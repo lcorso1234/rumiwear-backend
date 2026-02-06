@@ -12,8 +12,9 @@ const uploadRoutes = require("./routes/uploads");
 const productRoutes = require("./routes/products");
 
 const app = express();
-const port = process.env.PORT || 3001;
-const mongoUri = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/rumiwear";
+const port = process.env.PORT || 3002;
+const mongoUri =
+  process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/rumiwear";
 
 mongoose
   .connect(mongoUri)
