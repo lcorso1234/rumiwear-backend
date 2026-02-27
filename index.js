@@ -10,6 +10,7 @@ const videoRoutes = require("./routes/videos");
 const textRoutes = require("./routes/text");
 const uploadRoutes = require("./routes/uploads");
 const productRoutes = require("./routes/products");
+const quoteRoutes = require("./routes/quotes");
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -25,7 +26,7 @@ mongoose
     console.error("MongoDB connection error:", err.message);
   });
 
-app.use(cors());
+app.use(cors("*"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -40,6 +41,7 @@ app.use("/api/videos", videoRoutes);
 app.use("/api/text", textRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/quotes", quoteRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });

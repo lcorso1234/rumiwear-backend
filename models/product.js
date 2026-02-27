@@ -7,6 +7,7 @@ const ProductSchema = new mongoose.Schema(
     front: { type: String, required: true, trim: true },
     back: { type: String, required: true, trim: true },
     badge: { type: String, trim: true },
+    galleryImages: [{ type: String, trim: true }],
   },
   { timestamps: true }
 );

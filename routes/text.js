@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", controller.list);
 router.get("/key/:key", controller.getByKey);
 router.post("/", requireAdmin, controller.create);
-router.put("/key/:key", requireAdmin, controller.upsertByKey);
+router.put("/key/:key", controller.upsertByKey);
 router.delete("/:id", requireAdmin, controller.remove);
 
 module.exports = router;
