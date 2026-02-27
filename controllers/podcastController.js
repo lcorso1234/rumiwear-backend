@@ -1,4 +1,25 @@
 const Podcast = require("../models/podcast");
+const { PODCAST_CATEGORY_OPTIONS } = require("../utils/podcastOptions");
+
+const ALLOWED_FIELDS = [
+  "label",
+  "title",
+  "description",
+  "metric",
+  "audioUrl",
+  "coverImageUrl",
+  "publishedAt",
+];
+
+function pickAllowedFields(input) {
+  const output = {};
+  for (const field of ALLOWED_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(input, field)) {
+      output[field] = input[field];
+    }
+  }
+  return output;
+}
 
 exports.list = async (req, res, next) => {
   try {
@@ -21,9 +42,14 @@ exports.getById = async (req, res, next) => {
   }
 };
 
+exports.categories = (req, res) => {
+  res.json({ categories: PODCAST_CATEGORY_OPTIONS });
+};
+
 exports.create = async (req, res, next) => {
   try {
-    const item = await Podcast.create(req.body);
+    const payload = pickAllowedFields(req.body || {});
+    const item = await Podcast.create(payload);
     res.status(201).json(item);
   } catch (err) {
     next(err);
@@ -32,7 +58,8 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const item = await Podcast.findByIdAndUpdate(req.params.id, req.body, {
+    const payload = pickAllowedFields(req.body || {});
+    const item = await Podcast.findByIdAndUpdate(req.params.id, payload, {
       new: true,
       runValidators: true,
     });

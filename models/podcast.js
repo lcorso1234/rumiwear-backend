@@ -1,8 +1,15 @@
 const mongoose = require("mongoose");
+const { PODCAST_CATEGORY_VALUES } = require("../utils/podcastOptions");
 
 const PodcastSchema = new mongoose.Schema(
   {
-    label: { type: String, required: true, trim: true },
+    label: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+      enum: PODCAST_CATEGORY_VALUES,
+    },
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true, maxlength: 500 },
     metric: { type: String, required: true, trim: true },

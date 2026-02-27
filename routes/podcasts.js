@@ -5,9 +5,10 @@ const requireAdmin = require("../middleware/adminAuth");
 const router = express.Router();
 
 router.get("/", controller.list);
+router.get("/categories", controller.categories);
 router.get("/:id", controller.getById);
 router.post("/", controller.create);
-router.put("/:id", controller.update);
-router.delete("/:id", controller.remove);
+router.put("/:id", requireAdmin, controller.update);
+router.delete("/:id", requireAdmin, controller.remove);
 
 module.exports = router;
