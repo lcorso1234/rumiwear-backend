@@ -29,6 +29,8 @@ mongoose
 const defaultAllowedOrigins = [
   "https://rumiwear.net",
   "https://www.rumiwear.net",
+  "http://localhost:3000",
+  "http://localhost:3001",
 ];
 
 const envAllowedOrigins = String(process.env.CORS_ALLOWED_ORIGINS || "")
@@ -36,22 +38,56 @@ const envAllowedOrigins = String(process.env.CORS_ALLOWED_ORIGINS || "")
   .map((item) => item.trim())
   .filter(Boolean);
 
+const envAllowedOriginSuffixes = String(process.env.CORS_ALLOWED_ORIGIN_SUFFIXES || "")
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean)
+  .map((suffix) => (suffix.startsWith(".") ? suffix : `.${suffix}`));
+
+const allowedOriginSuffixes = Array.from(
+  new Set([".vercel.app", ...envAllowedOriginSuffixes]),
+);
+
+const normalizeOrigin = (value) => String(value || "").trim().replace(/\/$/, "");
+
 const allowedOrigins = Array.from(
   new Set([...defaultAllowedOrigins, ...envAllowedOrigins]),
+).map(normalizeOrigin);
+
+const isAllowedOrigin = (origin) => {
+  const normalizedOrigin = normalizeOrigin(origin);
+  if (!normalizedOrigin) return true;
+
+  if (allowedOrigins.includes(normalizedOrigin)) return true;
+
+  let host;
+  try {
+    host = new URL(normalizedOrigin).hostname;
+  } catch (err) {
+    return false;
+  }
+
+  return allowedOriginSuffixes.some((suffix) => host.endsWith(suffix));
+};
+
+console.log(
+  "[cors] allowed origins:",
+  allowedOrigins.join(", "),
+  "| suffixes:",
+  allowedOriginSuffixes.join(", "),
 );
 
 const corsOptions = {
   origin: function (origin, callback) {
     // allow server-to-server requests (no Origin header) + tools like curl/postman
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
 
     return callback(new Error("Not allowed by CORS: " + origin));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
