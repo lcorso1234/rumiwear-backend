@@ -26,7 +26,38 @@ mongoose
     console.error("MongoDB connection error:", err.message);
   });
 
-app.use(cors("*"));
+const defaultAllowedOrigins = [
+  "https://rumiwear.net",
+  "https://www.rumiwear.net",
+];
+
+const envAllowedOrigins = String(process.env.CORS_ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((item) => item.trim())
+  .filter(Boolean);
+
+const allowedOrigins = Array.from(
+  new Set([...defaultAllowedOrigins, ...envAllowedOrigins]),
+);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow server-to-server requests (no Origin header) + tools like curl/postman
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    return callback(new Error("Not allowed by CORS: " + origin));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+
+// handle preflight
+app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
