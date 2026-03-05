@@ -35,6 +35,10 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).send("OK - rumiwear backend running");
+});
+
 app.use("/api/blog", blogRoutes);
 app.use("/api/podcasts", podcastRoutes);
 app.use("/api/videos", videoRoutes);
