@@ -38,7 +38,9 @@ const envAllowedOrigins = String(process.env.CORS_ALLOWED_ORIGINS || "")
   .map((item) => item.trim())
   .filter(Boolean);
 
-const envAllowedOriginSuffixes = String(process.env.CORS_ALLOWED_ORIGIN_SUFFIXES || "")
+const envAllowedOriginSuffixes = String(
+  process.env.CORS_ALLOWED_ORIGIN_SUFFIXES || "",
+)
   .split(",")
   .map((item) => item.trim())
   .filter(Boolean)
@@ -48,7 +50,10 @@ const allowedOriginSuffixes = Array.from(
   new Set([".vercel.app", ...envAllowedOriginSuffixes]),
 );
 
-const normalizeOrigin = (value) => String(value || "").trim().replace(/\/$/, "");
+const normalizeOrigin = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\/$/, "");
 
 const allowedOrigins = Array.from(
   new Set([...defaultAllowedOrigins, ...envAllowedOrigins]),
@@ -95,8 +100,7 @@ const corsOptions = {
   ],
   optionsSuccessStatus: 204,
 };
-
-app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 // handle preflight
 app.options(/.*/, cors(corsOptions));
